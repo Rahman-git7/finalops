@@ -1,0 +1,156 @@
+version: "3.9"
+
+networks:
+  finalops-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: finalops
+      POSTGRES_PASSWORD: finalops_dev
+      POSTGRES_DB: finalops
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-schemas.sql:/docker-entrypoint-initdb.d/00-init-schemas.sql
+      - ./services/auth-service/migrations/001_create_users.up.sql:/docker-entrypoint-initdb.d/01-auth.sql
+      - ./services/exercise-service/migrations/001_create_exercises.up.sql:/docker-entrypoint-initdb.d/02-exercise.sql
+      - ./services/exercise-service/seed/exercises_seed.sql:/docker-entrypoint-initdb.d/03-exercise-seed.sql
+      - ./services/workout-service/migrations/001_create_workout.up.sql:/docker-entrypoint-initdb.d/04-workout.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - finalops-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finalops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - finalops-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    environment:
+      DB_DSN: postgres://auth_user:auth_pass@postgres:5432/finalops?search_path=auth&sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-finalops_super_secret_key_change_in_prod}
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL: 168h
+      PORT: "8001"
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finalops-net
+    restart: on-failure
+
+  exercise-service:
+    build:
+      context: ./services/exercise-service
+      dockerfile: Dockerfile
+    environment:
+      DB_DSN: postgres://exercise_user:exercise_pass@postgres:5432/finalops?search_path=exercise&sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-finalops_super_secret_key_change_in_prod}
+      PORT: "8002"
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finalops-net
+    restart: on-failure
+
+  workout-service:
+    build:
+      context: ./services/workout-service
+      dockerfile: Dockerfile
+    environment:
+      DB_DSN: postgres://workout_user:workout_pass@postgres:5432/finalops?search_path=workout&sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-finalops_super_secret_key_change_in_prod}
+      EXERCISE_SERVICE_URL: http://exercise-service:8002
+      PORT: "8003"
+    ports:
+      - "8003:8003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      exercise-service:
+        condition: service_started
+    networks:
+      - finalops-net
+    restart: on-failure
+
+  analytics-service:
+    build:
+      context: ./services/analytics-service
+      dockerfile: Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-finalops_super_secret_key_change_in_prod}
+      WORKOUT_SERVICE_URL: http://workout-service:8003
+      REDIS_URL: redis://redis:6379
+      CACHE_TTL: 5m
+      PORT: "8004"
+    ports:
+      - "8004:8004"
+    depends_on:
+      redis:
+        condition: service_healthy
+      workout-service:
+        condition: service_started
+    networks:
+      - finalops-net
+    restart: on-failure
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - exercise-service
+      - workout-service
+      - analytics-service
+      - frontend
+    networks:
+      - finalops-net
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./frontend/src:/app/src
+    environment:
+      VITE_API_BASE_URL: ""
+    ports:
+      - "3000:3000"
+    networks:
+      - finalops-net
+    restart: on-failure

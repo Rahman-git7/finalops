@@ -1,0 +1,34 @@
+# Go
+bin/
+*.exe
+*.test
+*.out
+vendor/
+
+# Env
+.env
+.env.local
+*.env
+
+# Node
+node_modules/
+dist/
+.vite/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Docker
+*.pid
+
+# Terraform (future)
+*.tfstate
+*.tfstate.backup
+.terraform/
