@@ -54,3 +54,6 @@ CREATE TABLE IF NOT EXISTS workout.sets (
 );
 
 CREATE INDEX IF NOT EXISTS idx_sets_session_exercise ON workout.sets(session_exercise_id);
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA workout TO workout_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA workout TO workout_user;

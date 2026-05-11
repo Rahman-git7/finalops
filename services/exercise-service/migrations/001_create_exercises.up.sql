@@ -23,3 +23,7 @@ CREATE TABLE IF NOT EXISTS exercise.exercises (
 CREATE INDEX IF NOT EXISTS idx_exercises_category ON exercise.exercises(category_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_muscle   ON exercise.exercises(primary_muscle);
 CREATE INDEX IF NOT EXISTS idx_exercises_name     ON exercise.exercises USING gin(to_tsvector('french', name));
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA exercise TO exercise_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA exercise TO exercise_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA exercise TO workout_user;

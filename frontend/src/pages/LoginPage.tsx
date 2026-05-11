@@ -33,22 +33,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <h1 className="text-5xl font-black tracking-tight mb-2">
             <span className="text-brand-500">FINAL</span>
             <span className="text-white">OPS</span>
           </h1>
-          <p className="text-zinc-500 text-sm">Tracker de performance fitness</p>
+          <p className="text-slate-500 text-sm">Tracker de performance fitness</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-          <div className="flex gap-2 mb-6 bg-zinc-800 rounded-lg p-1">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+          <div className="flex gap-2 mb-6 bg-slate-800 rounded-lg p-1">
             <button
               onClick={() => setMode('login')}
               className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
-                mode === 'login' ? 'bg-brand-500 text-white' : 'text-zinc-400 hover:text-white'
+                mode === 'login' ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Connexion
@@ -56,7 +56,7 @@ export default function LoginPage() {
             <button
               onClick={() => setMode('register')}
               className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
-                mode === 'register' ? 'bg-brand-500 text-white' : 'text-zinc-400 hover:text-white'
+                mode === 'register' ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               Inscription
@@ -66,35 +66,35 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Nom d'utilisateur</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5">Nom d'utilisateur</label>
                 <input
                   type="text"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-brand-500 transition-colors"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500 transition-colors"
                   placeholder="johndoe"
                   required
                 />
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500 transition-colors"
                 placeholder="john@example.com"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Mot de passe</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Mot de passe</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500 transition-colors"
                 placeholder="••••••••"
                 required
               />

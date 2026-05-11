@@ -46,25 +46,25 @@ export default function CalendarPage() {
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-white">Calendrier</h2>
         <div className="flex items-center gap-4">
-          <button onClick={prev} className="text-zinc-400 hover:text-white transition-colors p-2">◀</button>
+          <button onClick={prev} className="text-slate-400 hover:text-white transition-colors p-2">◀</button>
           <span className="text-lg font-semibold text-white min-w-[200px] text-center">
             {MONTHS[month - 1]} {year}
           </span>
-          <button onClick={next} className="text-zinc-400 hover:text-white transition-colors p-2">▶</button>
+          <button onClick={next} className="text-slate-400 hover:text-white transition-colors p-2">▶</button>
         </div>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <div className="grid grid-cols-7 mb-4">
           {DAYS.map(d => (
-            <div key={d} className="text-center text-xs font-semibold text-zinc-500 uppercase tracking-wider py-2">
+            <div key={d} className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider py-2">
               {d}
             </div>
           ))}
         </div>
 
         {isLoading ? (
-          <div className="text-center py-12 text-zinc-500 text-sm">Chargement...</div>
+          <div className="text-center py-12 text-slate-500 text-sm">Chargement...</div>
         ) : (
           <div className="grid grid-cols-7 gap-1">
             {cells.map((day, i) => {
@@ -83,8 +83,8 @@ export default function CalendarPage() {
                     ${hasSession
                       ? 'bg-brand-500 text-white hover:bg-brand-600'
                       : isToday
-                      ? 'bg-zinc-800 text-brand-400 ring-1 ring-brand-500/50'
-                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                      ? 'bg-slate-800 text-brand-400 ring-1 ring-brand-500/50'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                     }
                   `}
                 >
@@ -102,33 +102,33 @@ export default function CalendarPage() {
       <div className="mt-6 flex items-center gap-6">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-brand-500" />
-          <span className="text-sm text-zinc-400">Jour d'entraînement</span>
+          <span className="text-sm text-slate-400">Jour d'entraînement</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-zinc-800 ring-1 ring-brand-500/50" />
-          <span className="text-sm text-zinc-400">Aujourd'hui</span>
+          <div className="w-4 h-4 rounded bg-slate-800 ring-1 ring-brand-500/50" />
+          <span className="text-sm text-slate-400">Aujourd'hui</span>
         </div>
       </div>
 
       {days && (
-        <div className="mt-6 bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-zinc-400 mb-3">Résumé du mois</h3>
+        <div className="mt-6 bg-slate-900 border border-slate-800 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-400 mb-3">Résumé du mois</h3>
           <div className="flex gap-8">
             <div>
               <p className="text-2xl font-bold text-white">{sessionDays.size}</p>
-              <p className="text-xs text-zinc-500">Jours d'entraînement</p>
+              <p className="text-xs text-slate-500">Jours d'entraînement</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white">
                 {Array.from(sessionDays.values()).reduce((sum, d) => sum + (d.duration_minutes ?? 0), 0)}
               </p>
-              <p className="text-xs text-zinc-500">Minutes totales</p>
+              <p className="text-xs text-slate-500">Minutes totales</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-brand-400">
                 {Array.from(sessionDays.values()).reduce((sum, d) => sum + (d.calories_burned ?? 0), 0)}
               </p>
-              <p className="text-xs text-zinc-500">Calories totales</p>
+              <p className="text-xs text-slate-500">Calories totales</p>
             </div>
           </div>
         </div>

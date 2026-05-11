@@ -11,8 +11,8 @@ import { fr } from 'date-fns/locale'
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs">
-      <p className="text-zinc-400 mb-1">{label}</p>
+    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs">
+      <p className="text-slate-400 mb-1">{label}</p>
       {payload.map((p: any) => (
         <p key={p.name} style={{ color: p.color }}>
           {p.name}: <span className="font-bold text-white">{p.value}</span>
@@ -51,11 +51,11 @@ export default function ProgressPage() {
       <h2 className="text-3xl font-bold text-white mb-8">Progression</h2>
 
       <div className="mb-6">
-        <label className="block text-xs font-medium text-zinc-400 mb-2">Choisir un exercice</label>
+        <label className="block text-xs font-medium text-slate-400 mb-2">Choisir un exercice</label>
         <select
           value={selectedExercise}
           onChange={e => setSelectedExercise(e.target.value)}
-          className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 min-w-[280px]"
+          className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 min-w-[280px]"
         >
           <option value="">-- Sélectionner --</option>
           {exercises?.map(ex => (
@@ -67,20 +67,20 @@ export default function ProgressPage() {
       {!selectedExercise && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="text-5xl mb-4">📈</div>
-          <p className="text-zinc-500">Sélectionne un exercice pour voir ta progression</p>
+          <p className="text-slate-500">Sélectionne un exercice pour voir ta progression</p>
         </div>
       )}
 
       {selectedExercise && isLoading && (
-        <p className="text-zinc-500 text-sm">Chargement des données...</p>
+        <p className="text-slate-500 text-sm">Chargement des données...</p>
       )}
 
       {selectedExercise && !isLoading && progression && (
         <>
           {progression.length === 0 ? (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">
-              <p className="text-zinc-500">Aucune donnée pour cet exercice.</p>
-              <p className="text-zinc-600 text-xs mt-1">Logger des séances pour voir ta progression.</p>
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
+              <p className="text-slate-500">Aucune donnée pour cet exercice.</p>
+              <p className="text-slate-600 text-xs mt-1">Logger des séances pour voir ta progression.</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -101,21 +101,21 @@ export default function ProgressPage() {
                     ? last.max_weight - prev.max_weight : null
                   return (
                     <>
-                      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Poids max actuel</p>
-                        <p className="text-3xl font-bold text-white">{last.max_weight ?? '—'} <span className="text-base text-zinc-500 font-normal">kg</span></p>
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Poids max actuel</p>
+                        <p className="text-3xl font-bold text-white">{last.max_weight ?? '—'} <span className="text-base text-slate-500 font-normal">kg</span></p>
                         {weightDiff !== null && (
                           <p className={`text-xs mt-1 font-medium ${weightDiff >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                             {weightDiff >= 0 ? '+' : ''}{weightDiff.toFixed(1)} kg vs séance précédente
                           </p>
                         )}
                       </div>
-                      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Volume dernière séance</p>
-                        <p className="text-3xl font-bold text-white">{last.total_volume} <span className="text-base text-zinc-500 font-normal">kg</span></p>
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Volume dernière séance</p>
+                        <p className="text-3xl font-bold text-white">{last.total_volume} <span className="text-base text-slate-500 font-normal">kg</span></p>
                       </div>
-                      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Nombre de séances</p>
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Nombre de séances</p>
                         <p className="text-3xl font-bold text-white">{progression.length}</p>
                       </div>
                     </>
@@ -123,33 +123,33 @@ export default function ProgressPage() {
                 })()}
               </div>
 
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-                <h4 className="text-sm font-semibold text-zinc-400 mb-4">Évolution du poids (kg)</h4>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <h4 className="text-sm font-semibold text-slate-400 mb-4">Évolution du poids (kg)</h4>
                 <ResponsiveContainer width="100%" height={240}>
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                    <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 11 }} />
-                    <YAxis tick={{ fill: '#71717a', fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 11 }} />
+                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} />
                     <Tooltip content={<CustomTooltip />} />
                     <Line
                       type="monotone"
                       dataKey="Poids max (kg)"
-                      stroke="#f97316"
+                      stroke="#3b82f6"
                       strokeWidth={2}
-                      dot={{ fill: '#f97316', r: 4 }}
+                      dot={{ fill: '#3b82f6', r: 4 }}
                       connectNulls
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-                <h4 className="text-sm font-semibold text-zinc-400 mb-4">Volume total par séance (kg)</h4>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <h4 className="text-sm font-semibold text-slate-400 mb-4">Volume total par séance (kg)</h4>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-                    <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 11 }} />
-                    <YAxis tick={{ fill: '#71717a', fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 11 }} />
+                    <YAxis tick={{ fill: '#64748b', fontSize: 11 }} />
                     <Tooltip content={<CustomTooltip />} />
                     <Line
                       type="monotone"

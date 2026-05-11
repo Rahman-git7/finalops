@@ -5,7 +5,10 @@
       "Bash(chmod +x /Users/jinsan/finalops/scripts/dev-up.sh /Users/jinsan/finalops/scripts/dev-down.sh)",
       "Bash(npm install *)",
       "Bash(npm run *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git remote *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

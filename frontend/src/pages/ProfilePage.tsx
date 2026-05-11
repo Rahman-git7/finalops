@@ -73,42 +73,42 @@ export default function ProfilePage() {
     <div className="p-8 max-w-2xl">
       <h2 className="text-3xl font-bold text-white mb-8">Profil</h2>
 
-      <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
-        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Informations du compte</h3>
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Informations du compte</h3>
         <div className="space-y-1">
-          <div className="flex justify-between py-2 border-b border-zinc-800">
-            <span className="text-sm text-zinc-500">Nom d'utilisateur</span>
+          <div className="flex justify-between py-2 border-b border-slate-800">
+            <span className="text-sm text-slate-500">Nom d'utilisateur</span>
             <span className="text-sm font-medium text-white">{user?.username}</span>
           </div>
           <div className="flex justify-between py-2">
-            <span className="text-sm text-zinc-500">Email</span>
+            <span className="text-sm text-slate-500">Email</span>
             <span className="text-sm font-medium text-white">{user?.email}</span>
           </div>
         </div>
       </section>
 
-      <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
-        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Données physiques</h3>
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Données physiques</h3>
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Poids (kg)</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Poids (kg)</label>
             <input
               type="number" value={weightKg} onChange={e => setWeightKg(e.target.value)} placeholder="75"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Âge</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Âge</label>
             <input
               type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="25"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Sexe</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Sexe</label>
             <select
               value={sex} onChange={e => setSex(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
             >
               <option value="">—</option>
               <option value="male">Homme</option>
@@ -126,22 +126,22 @@ export default function ProfilePage() {
         </button>
       </section>
 
-      <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-        <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Programmes d'entraînement</h3>
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Programmes d'entraînement</h3>
 
         <div className="space-y-2 mb-4">
           {programs?.length === 0 && (
-            <p className="text-zinc-600 text-sm">Aucun programme créé.</p>
+            <p className="text-slate-600 text-sm">Aucun programme créé.</p>
           )}
           {programs?.map(p => (
-            <div key={p.id} className="flex items-center justify-between py-3 border-b border-zinc-800 last:border-0">
+            <div key={p.id} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
               <div>
                 <p className="text-sm font-medium text-white">{p.name}</p>
-                <p className="text-xs text-zinc-500">{p.program_type ?? `Type ${p.program_type_id}`}</p>
+                <p className="text-xs text-slate-500">{p.program_type ?? `Type ${p.program_type_id}`}</p>
               </div>
               <button
                 onClick={() => deleteProgramMut.mutate(p.id)}
-                className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+                className="text-xs text-slate-600 hover:text-red-400 transition-colors"
               >
                 Supprimer
               </button>
@@ -149,16 +149,16 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        <div className="space-y-3 border-t border-zinc-800 pt-4">
-          <p className="text-xs font-medium text-zinc-400">Nouveau programme</p>
+        <div className="space-y-3 border-t border-slate-800 pt-4">
+          <p className="text-xs font-medium text-slate-400">Nouveau programme</p>
           <div className="grid grid-cols-2 gap-3">
             <input
               value={newProgramName} onChange={e => setNewProgramName(e.target.value)} placeholder="Nom du programme"
-              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
             />
             <select
               value={newProgramType} onChange={e => setNewProgramType(Number(e.target.value))}
-              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
             >
               <option value="">Type de programme</option>
               {programTypes?.map(t => (
@@ -168,7 +168,7 @@ export default function ProfilePage() {
           </div>
           <input
             value={newProgramNotes} onChange={e => setNewProgramNotes(e.target.value)} placeholder="Notes (optionnel)"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
           />
           <button
             onClick={() => createProgramMut.mutate()}

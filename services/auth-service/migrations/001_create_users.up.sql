@@ -26,3 +26,6 @@ CREATE TABLE IF NOT EXISTS auth.refresh_tokens (
 );
 
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON auth.refresh_tokens(user_id);
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO auth_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO auth_user;
