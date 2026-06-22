@@ -62,5 +62,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/frontend/deployment.yaml
+          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update frontend image to ${SHA}"
           git push
