@@ -84,8 +84,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/auth-service/deployment.yaml
-          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update auth-service image to ${SHA}"
+          git pull --rebase origin main
           git push
 
   # ── exercise-service ─────────────────────────────────────────
@@ -132,8 +132,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/exercise-service/deployment.yaml
-          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update exercise-service image to ${SHA}"
+          git pull --rebase origin main
           git push
 
   # ── workout-service ──────────────────────────────────────────
@@ -180,8 +180,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/workout-service/deployment.yaml
-          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update workout-service image to ${SHA}"
+          git pull --rebase origin main
           git push
 
   # ── analytics-service ────────────────────────────────────────
@@ -228,8 +228,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/analytics-service/deployment.yaml
-          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update analytics-service image to ${SHA}"
+          git pull --rebase origin main
           git push
 
   # ── frontend ─────────────────────────────────────────────────
@@ -278,6 +278,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/kubernetes/frontend/deployment.yaml
-          git pull --rebase origin main
           git diff --staged --quiet || git commit -m "ci: update frontend image to ${SHA}"
+          git pull --rebase origin main
           git push
