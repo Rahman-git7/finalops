@@ -1,0 +1,68 @@
+---
+# Déploie FinalOps via ArgoCD (après que ArgoCD est installé)
+# Usage: ansible-playbook -i inventory/homelab.ini playbooks/03-deploy-finalops.yml
+- name: Deploy FinalOps via ArgoCD
+  hosts: homelab
+  become: true
+
+  tasks:
+    - name: Apply ArgoCD app-of-apps
+      shell: |
+        k3s kubectl apply -f - <<'EOF'
+        apiVersion: argoproj.io/v1alpha1
+        kind: Application
+        metadata:
+          name: finalops-root
+          namespace: argocd
+          finalizers:
+            - resources-finalizer.argocd.argoproj.io
+        spec:
+          project: default
+          source:
+            repoURL: https://github.com/Rahman-git7/finalops.git
+            targetRevision: main
+            path: argocd/apps
+          destination:
+            server: https://kubernetes.default.svc
+            namespace: argocd
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+            syncOptions:
+              - CreateNamespace=true
+        EOF
+      changed_when: true
+
+    - name: Wait for FinalOps pods to be ready
+      shell: k3s kubectl wait --for=condition=ready pod -l app=auth-service -n finalops --timeout=120s
+      retries: 5
+      delay: 20
+      ignore_errors: true
+
+    - name: Check FinalOps pods status
+      shell: k3s kubectl get pods -n finalops
+      register: pods_status
+      changed_when: false
+
+    - name: Show pods status
+      debug:
+        msg: "{{ pods_status.stdout_lines }}"
+
+    - name: Get ingress IP
+      shell: k3s kubectl get ingress finalops -n finalops -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+      register: ingress_ip
+      changed_when: false
+      ignore_errors: true
+
+    - name: Show access info
+      debug:
+        msg: |
+          ============================================
+          FinalOps déployé !
+
+          Ajoute dans /etc/hosts (sur ta machine cliente) :
+          {{ ansible_host }}  finalops.homelab
+
+          Accès: http://finalops.homelab
+          ============================================

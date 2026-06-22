@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+  namespace: finalops
+data:
+  nginx.conf: |
+    upstream auth_service    { server auth-service:8001; }
+    upstream exercise_svc    { server exercise-service:8002; }
+    upstream workout_svc     { server workout-service:8003; }
+    upstream analytics_svc   { server analytics-service:8004; }
+    upstream frontend_svc    { server frontend:80; }
+
+    server {
+        listen 80;
+        server_name _;
+        client_max_body_size 10m;
+
+        location /api/auth/ {
+            proxy_pass         http://auth_service/auth/;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        location /api/exercises {
+            proxy_pass         http://exercise_svc/exercises;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+        }
+
+        location /api/workouts/ {
+            proxy_pass         http://workout_svc/workouts/;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+        }
+
+        location /api/analytics/ {
+            proxy_pass         http://analytics_svc/analytics/;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+        }
+
+        location / {
+            proxy_pass         http://frontend_svc;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+        }
+    }

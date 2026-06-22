@@ -1,0 +1,27 @@
+version: "3.9"
+
+# Production overrides — use with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  auth-service:
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+
+  exercise-service:
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+
+  workout-service:
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+
+  analytics-service:
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+
+  frontend:
+    build:
+      target: prod
+    volumes: []
+    ports:
+      - "3000:80"

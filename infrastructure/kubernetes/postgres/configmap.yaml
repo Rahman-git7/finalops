@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: finalops
+data:
+  00-init-schemas.sql: |
+    CREATE SCHEMA IF NOT EXISTS auth;
+    CREATE SCHEMA IF NOT EXISTS exercise;
+    CREATE SCHEMA IF NOT EXISTS workout;
+
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'auth_user') THEN
+        CREATE USER auth_user WITH PASSWORD 'AUTH_DB_PASSWORD_PLACEHOLDER';
+      END IF;
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'exercise_user') THEN
+        CREATE USER exercise_user WITH PASSWORD 'EXERCISE_DB_PASSWORD_PLACEHOLDER';
+      END IF;
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'workout_user') THEN
+        CREATE USER workout_user WITH PASSWORD 'WORKOUT_DB_PASSWORD_PLACEHOLDER';
+      END IF;
+    END
+    $$;
+
+    GRANT ALL PRIVILEGES ON SCHEMA auth TO auth_user;
+    GRANT ALL PRIVILEGES ON SCHEMA exercise TO exercise_user;
+    GRANT ALL PRIVILEGES ON SCHEMA workout TO workout_user;
+    GRANT USAGE ON SCHEMA exercise TO workout_user;

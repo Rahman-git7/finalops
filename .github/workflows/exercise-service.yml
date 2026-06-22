@@ -1,0 +1,65 @@
+name: exercise-service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/exercise-service/**'
+      - '.github/workflows/exercise-service.yml'
+  pull_request:
+    paths:
+      - 'services/exercise-service/**'
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/finalops/exercise-service
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: services/exercise-service/go.sum
+      - name: Vet
+        working-directory: services/exercise-service
+        run: go vet ./...
+
+  build-push:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      sha: ${{ steps.sha.outputs.short }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: services/exercise-service
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Update k8s image tag
+        run: |
+          SHA=${{ steps.sha.outputs.short }}
+          sed -i "s|image: .*exercise-service:.*|image: ${{ env.IMAGE }}:${SHA}|" \
+            infrastructure/kubernetes/exercise-service/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/exercise-service/deployment.yaml
+          git diff --staged --quiet || git commit -m "ci: update exercise-service image to ${SHA}"
+          git push

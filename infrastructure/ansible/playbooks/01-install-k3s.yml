@@ -1,0 +1,56 @@
+---
+# Installe k3s (Kubernetes léger) sur le serveur homelab
+# Usage: ansible-playbook -i inventory/homelab.ini playbooks/01-install-k3s.yml
+- name: Install k3s on homelab
+  hosts: homelab
+  become: true
+
+  vars:
+    k3s_version: "v1.30.0+k3s1"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install prerequisites
+      apt:
+        name: [curl, git, open-iscsi, nfs-common]
+        state: present
+
+    - name: Install k3s
+      shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - \
+          --write-kubeconfig-mode 644 \
+          --disable traefik
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Wait for k3s to be ready
+      shell: k3s kubectl get nodes
+      register: nodes
+      until: nodes.rc == 0
+      retries: 20
+      delay: 10
+
+    - name: Install nginx ingress controller
+      shell: |
+        k3s kubectl apply -f \
+          https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
+      changed_when: true
+
+    - name: Fetch kubeconfig to local machine
+      fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "~/.kube/finalops-homelab.yaml"
+        flat: true
+      become: true
+
+    - name: Show connection info
+      debug:
+        msg: |
+          k3s installed!
+          Sur ta machine locale, configure kubectl :
+            export KUBECONFIG=~/.kube/finalops-homelab.yaml
+          Puis remplace '127.0.0.1' par l'IP du serveur dans ce fichier.

@@ -1,0 +1,20 @@
+# Ingress : tout le trafic va vers le nginx api-gateway qui route ensuite vers les services
+# Compatible k3s (Traefik) et nginx-ingress-controller
+# Remplace finalops.homelab par ton domaine ou IP
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finalops
+  namespace: finalops
+spec:
+  rules:
+    - host: finalops.homelab
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80

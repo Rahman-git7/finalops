@@ -1,0 +1,72 @@
+---
+# Installe ArgoCD et configure le GitOps pour FinalOps
+# Prérequis: kubectl configuré vers le cluster k3s
+# Usage: ansible-playbook -i inventory/homelab.ini playbooks/02-install-argocd.yml
+- name: Install ArgoCD and configure FinalOps GitOps
+  hosts: homelab
+  become: true
+
+  vars:
+    argocd_version: "v2.11.0"
+    finalops_namespace: finalops
+
+  tasks:
+    - name: Create argocd namespace
+      shell: k3s kubectl create namespace argocd --dry-run=client -o yaml | k3s kubectl apply -f -
+
+    - name: Install ArgoCD
+      shell: |
+        k3s kubectl apply -n argocd -f \
+          https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml
+      changed_when: true
+
+    - name: Wait for ArgoCD server to be ready
+      shell: k3s kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=120s
+      retries: 5
+      delay: 15
+
+    - name: Get ArgoCD initial admin password
+      shell: k3s kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+      register: argocd_password
+      changed_when: false
+
+    - name: Create finalops namespace
+      shell: k3s kubectl create namespace {{ finalops_namespace }} --dry-run=client -o yaml | k3s kubectl apply -f -
+
+    - name: Create finalops secrets (IMPORTANT - change these values!)
+      shell: |
+        k3s kubectl create secret generic finalops-secrets \
+          --namespace {{ finalops_namespace }} \
+          --from-literal=JWT_SECRET="{{ lookup('env', 'FINALOPS_JWT_SECRET') | default('CHANGE_ME_' + 99999 | random | string) }}" \
+          --from-literal=POSTGRES_PASSWORD="{{ lookup('env', 'FINALOPS_PG_PASSWORD') | default('pg_' + 99999 | random | string) }}" \
+          --from-literal=AUTH_DB_PASSWORD="{{ lookup('env', 'FINALOPS_AUTH_DB_PASSWORD') | default('auth_' + 99999 | random | string) }}" \
+          --from-literal=EXERCISE_DB_PASSWORD="{{ lookup('env', 'FINALOPS_EXERCISE_DB_PASSWORD') | default('ex_' + 99999 | random | string) }}" \
+          --from-literal=WORKOUT_DB_PASSWORD="{{ lookup('env', 'FINALOPS_WORKOUT_DB_PASSWORD') | default('wo_' + 99999 | random | string) }}" \
+          --dry-run=client -o yaml | k3s kubectl apply -f -
+      no_log: true
+
+    - name: Apply ArgoCD app-of-apps
+      copy:
+        src: "{{ playbook_dir }}/../../argocd/app-of-apps.yaml"
+        dest: /tmp/finalops-app-of-apps.yaml
+      notify: Apply app-of-apps
+
+    - name: Show ArgoCD access info
+      debug:
+        msg: |
+          ============================================
+          ArgoCD installé !
+
+          URL: http://{{ ansible_host }}:30080 (après port-forward)
+          ou: kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+          Login: admin
+          Password: {{ argocd_password.stdout }}
+
+          Prochaine étape:
+            kubectl apply -f argocd/app-of-apps.yaml
+          ============================================
+
+  handlers:
+    - name: Apply app-of-apps
+      shell: k3s kubectl apply -f /tmp/finalops-app-of-apps.yaml

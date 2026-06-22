@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: finalops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: ghcr.io/rahman-git7/finalops/auth-service:latest
+          ports:
+            - containerPort: 8001
+          env:
+            - name: PORT
+              value: "8001"
+            - name: JWT_ACCESS_TTL
+              value: "15m"
+            - name: JWT_REFRESH_TTL
+              value: "168h"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: finalops-secrets
+                  key: JWT_SECRET
+            - name: AUTH_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: finalops-secrets
+                  key: AUTH_DB_PASSWORD
+            - name: DB_DSN
+              value: "postgres://auth_user:$(AUTH_DB_PASSWORD)@postgres:5432/finalops?search_path=auth&sslmode=disable"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
