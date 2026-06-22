@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: analytics-service
-          image: ghcr.io/rahman-git7/finalops/analytics-service:latest
+          image: ghcr.io/rahman-git7/finalops/analytics-service:cdc9e62
           ports:
             - containerPort: 8004
           env:
