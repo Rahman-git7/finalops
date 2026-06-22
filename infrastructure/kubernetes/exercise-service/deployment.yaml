@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: exercise-service
-          image: ghcr.io/rahman-git7/finalops/exercise-service:latest
+          image: ghcr.io/rahman-git7/finalops/exercise-service:bf25a11
           ports:
             - containerPort: 8002
           env:
