@@ -1,0 +1,283 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io/rahman-git7/finalops
+
+jobs:
+  # Détecte quels services ont changé
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth:     ${{ steps.filter.outputs.auth }}
+      exercise: ${{ steps.filter.outputs.exercise }}
+      workout:  ${{ steps.filter.outputs.workout }}
+      analytics: ${{ steps.filter.outputs.analytics }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'services/auth-service/**'
+              - '.github/workflows/ci.yml'
+            exercise:
+              - 'services/exercise-service/**'
+              - '.github/workflows/ci.yml'
+            workout:
+              - 'services/workout-service/**'
+              - '.github/workflows/ci.yml'
+            analytics:
+              - 'services/analytics-service/**'
+              - '.github/workflows/ci.yml'
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/ci.yml'
+
+  # ── auth-service ────────────────────────────────────────────
+  auth-service:
+    needs: changes
+    if: needs.changes.outputs.auth == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: services/auth-service/go.sum
+      - name: Vet
+        working-directory: services/auth-service
+        run: go vet ./...
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: services/auth-service
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/auth-service:latest
+            ${{ env.REGISTRY }}/auth-service:${{ github.sha && github.sha || 'latest' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - if: github.ref == 'refs/heads/main'
+        name: Update k8s image tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          sed -i "s|image: .*auth-service:.*|image: ${{ env.REGISTRY }}/auth-service:${SHA}|" \
+            infrastructure/kubernetes/auth-service/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/auth-service/deployment.yaml
+          git pull --rebase origin main
+          git diff --staged --quiet || git commit -m "ci: update auth-service image to ${SHA}"
+          git push
+
+  # ── exercise-service ─────────────────────────────────────────
+  exercise-service:
+    needs: changes
+    if: needs.changes.outputs.exercise == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: services/exercise-service/go.sum
+      - name: Vet
+        working-directory: services/exercise-service
+        run: go vet ./...
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: services/exercise-service
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/exercise-service:latest
+            ${{ env.REGISTRY }}/exercise-service:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - if: github.ref == 'refs/heads/main'
+        name: Update k8s image tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          sed -i "s|image: .*exercise-service:.*|image: ${{ env.REGISTRY }}/exercise-service:${SHA}|" \
+            infrastructure/kubernetes/exercise-service/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/exercise-service/deployment.yaml
+          git pull --rebase origin main
+          git diff --staged --quiet || git commit -m "ci: update exercise-service image to ${SHA}"
+          git push
+
+  # ── workout-service ──────────────────────────────────────────
+  workout-service:
+    needs: changes
+    if: needs.changes.outputs.workout == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: services/workout-service/go.sum
+      - name: Vet
+        working-directory: services/workout-service
+        run: go vet ./...
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: services/workout-service
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/workout-service:latest
+            ${{ env.REGISTRY }}/workout-service:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - if: github.ref == 'refs/heads/main'
+        name: Update k8s image tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          sed -i "s|image: .*workout-service:.*|image: ${{ env.REGISTRY }}/workout-service:${SHA}|" \
+            infrastructure/kubernetes/workout-service/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/workout-service/deployment.yaml
+          git pull --rebase origin main
+          git diff --staged --quiet || git commit -m "ci: update workout-service image to ${SHA}"
+          git push
+
+  # ── analytics-service ────────────────────────────────────────
+  analytics-service:
+    needs: changes
+    if: needs.changes.outputs.analytics == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: services/analytics-service/go.sum
+      - name: Vet
+        working-directory: services/analytics-service
+        run: go vet ./...
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: services/analytics-service
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/analytics-service:latest
+            ${{ env.REGISTRY }}/analytics-service:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - if: github.ref == 'refs/heads/main'
+        name: Update k8s image tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          sed -i "s|image: .*analytics-service:.*|image: ${{ env.REGISTRY }}/analytics-service:${SHA}|" \
+            infrastructure/kubernetes/analytics-service/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/analytics-service/deployment.yaml
+          git pull --rebase origin main
+          git diff --staged --quiet || git commit -m "ci: update analytics-service image to ${SHA}"
+          git push
+
+  # ── frontend ─────────────────────────────────────────────────
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build check
+        working-directory: frontend
+        run: npm ci && npm run build
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend
+          target: prod
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/frontend:latest
+            ${{ env.REGISTRY }}/frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - if: github.ref == 'refs/heads/main'
+        name: Update k8s image tag
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          sed -i "s|image: .*finalops/frontend:.*|image: ${{ env.REGISTRY }}/frontend:${SHA}|" \
+            infrastructure/kubernetes/frontend/deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/kubernetes/frontend/deployment.yaml
+          git pull --rebase origin main
+          git diff --staged --quiet || git commit -m "ci: update frontend image to ${SHA}"
+          git push
